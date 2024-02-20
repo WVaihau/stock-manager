@@ -37,6 +37,9 @@ def main():
         if len(search_bar_value) == 0:
             st.write("**Tous les produits :**")
 
+
+        st.session_state["products"] = st.session_state["products"].sort_values(by='product_location')
+        
         N_cards_per_row = 3
         for n_row, row in st.session_state["products"].reset_index().iterrows():
             i = n_row%N_cards_per_row
@@ -49,40 +52,56 @@ def main():
     with tab_add:
         st.write("**\*Tous les champs doivent être remplis.**")
 
-        product_name = st.text_input("Nom du produit :", key="prd_name")
-        product_barcode = st.text_input("Barcode value :", key="prd_barcode")
-        product_location = st.text_input("Localisation au stock :", key="prd_location")
-
-        col_img, col_preview = st.columns(2)
-
-        with col_img:
+        with st.form("new_product", clear_on_submit=True, border=True):
+            product_name = st.text_input("Nom du produit :", key="prd_name")
+            product_barcode = st.text_input("Barcode value :", key="prd_barcode")
+            product_location = st.text_input("Localisation au stock :", key="prd_location")
             product_image = st.file_uploader("Image :", type=["png", "jpg"], key="prd_image")
-        
-        with col_preview:
-            if product_image:
-                st.write("**Image Preview :**")
-                st.image(product_image, use_column_width=True)
 
-        
-        prd_val = ["name", "barcode", "image", "location"]
+            warning_place_holder = st.empty()
 
-        proceed = True
+            submitted = st.form_submit_button("Enregistrer")
 
-        warning_placeholder = st.empty()
+            if submitted:
+                prd_val = ["name", "barcode", "image", "location"]
+                save_new_product = True
 
-        if st.button("Ajouter le produit"):
-            
-            if proceed:
-                stock.create_product(
-                    product_name,
-                    product_barcode,
-                    product_image,
-                    product_location
-                )
-                st.session_state["products"] = stock.get_stock()
-            else:
-                warning_placeholder.warning(
-                    "Complétez tous les champs pour continuer..")
+                for field_name in prd_val:
+                    value = st.session_state["prd_" + field_name]
+                    if value is None or value == "":
+                        save_new_product = False
+                        break
+                
+                if save_new_product:
+                    existing_products = st.session_state["products"]
+                    execute = True
+
+                    # Check location:
+                    all_loc = existing_products["product_location"].tolist()
+                    if product_location in all_loc:
+                        ex_product = existing_products[
+                            existing_products["product_location"] == product_location
+                        ].iloc[0, 0]
+                        warning_place_holder = warning_place_holder.error(
+                            f"'{ex_product}' est déjà enregistré à la position '{product_location}'"
+                        )
+                        execute = False
+
+                    if execute:
+                        # Update stock
+                        stock.create_product(
+                            product_name,
+                            product_barcode,
+                            product_image,
+                            product_location
+                        )
+
+                        # Update local product list with new change
+                        st.session_state["products"] = stock.get_stock()
+                else:
+                    warning_place_holder.warning(
+                        "Tous les champs doivent être remplis pour sauvegarder le produit.")
+
 
 if __name__ == "__main__":
     main()

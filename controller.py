@@ -146,11 +146,3 @@ class Stock:
         filter_df["product_name"] = filter_df["product_name"].map(lambda x: x.lower())
 
         return df[filter_df["product_name"].str.contains(text.lower())]
-
-
-def clear_form():
-    """Clear adding form fields."""
-    keys = [key for key in st.session_state.keys() if 'prd_' in key]
-
-    for key in keys:
-        st.session_state[key] = ""
