@@ -9,6 +9,7 @@ from google.oauth2 import service_account
 import google
 from io import BytesIO
 import mimetypes
+import streamlit_authenticator as stauth
 
 class Stock:
     """Stock class to manage the stock."""
@@ -146,3 +147,21 @@ class Stock:
         filter_df["product_name"] = filter_df["product_name"].map(lambda x: x.lower())
 
         return df[filter_df["product_name"].str.contains(text.lower())]
+
+
+# Security
+
+def auth_usr() -> stauth.Authenticate:
+    """Authenticate user."""
+
+    config = st.secrets["auth"]
+    authenticator = stauth.Authenticate(
+      config.credentials.to_dict(),
+      config.cookie.name,
+      config.cookie.key,
+      config.cookie.expiry_days,
+      config.preauthorized.to_dict()
+    )
+
+    return authenticator
+

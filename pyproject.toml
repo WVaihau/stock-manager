@@ -12,6 +12,7 @@ streamlit = "^1.31.1"
 google-api-python-client = "^2.118.0"
 python-barcode = "^0.15.1"
 pillow = "^10.2.0"
+streamlit-authenticator = "^0.3.1"
 
 
 [build-system]
