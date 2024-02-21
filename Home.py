@@ -1,5 +1,6 @@
 import streamlit as st
 import controller as ctrl
+import time
 
 st.set_page_config(
     page_title="Iaora Stock Manager",
@@ -49,15 +50,15 @@ def main():
 
                 st.write("**Tous les produits :**")
 
+            products_placeholder = st.empty()
 
-            st.session_state["products"] = st.session_state["products"].sort_values(by='product_location')
-
-            ctrl.display_products(st.session_state["products"])
+            with products_placeholder.container():
+                ctrl.display_products(st.session_state["products"], order_by=['product_location'])
         
         with tab_add:
             st.write("**\*Tous les champs doivent être remplis.**")
 
-            with st.form("new_product", clear_on_submit=True, border=True):
+            with st.form("new_product", clear_on_submit=False, border=True):
                 product_name = st.text_input("Nom du produit :", key="prd_name")
                 product_barcode = st.text_input("Barcode value :", key="prd_barcode")
                 product_location = st.text_input("Localisation au stock :", key="prd_location")
@@ -68,6 +69,7 @@ def main():
                 submitted = st.form_submit_button("Enregistrer")
 
                 if submitted:
+                    submit_bar = st.progress(0, text="Checking empty fields..")
                     prd_val = ["name", "barcode", "image", "location"]
                     save_new_product = True
 
@@ -76,8 +78,8 @@ def main():
                         if value is None or value == "":
                             save_new_product = False
                             break
-                    
                     if save_new_product:
+                        submit_bar.progress(33, text="Checking duplicate..")
                         existing_products = st.session_state["products"]
                         execute = True
 
@@ -93,16 +95,24 @@ def main():
                             execute = False
 
                         if execute:
-                            # Update stock
+                            submit_bar.progress(66, text="Updating stock..")
                             stock.create_product(
                                 product_name,
                                 product_barcode,
                                 product_image,
-                                product_location
+                                product_location,
+                                submit_bar
                             )
 
+                            submit_bar.progress(90, text="Updating local stock..")
                             # Update local product list with new change
                             st.session_state["products"] = stock.get_stock()
+                            with products_placeholder.container():
+                                ctrl.display_products(st.session_state["products"], order_by=['product_location'])
+                            
+                            submit_bar.progress(100, text="Product added to stock !")
+                        time.sleep(1)
+                        submit_bar.empty()
                     else:
                         warning_place_holder.warning(
                             "Tous les champs doivent être remplis pour sauvegarder le produit.")

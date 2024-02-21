@@ -65,37 +65,39 @@ class Stock:
             product_name: str,
             product_barcode: str,
             product_image,
-            product_location: str) -> None:
+            product_location: str,
+            progress_bar) -> None:
         """Update the stock."""
 
-        with st.spinner("Saving image.."):
-            # Save Image and get its ID
-            img_id = self.save_photo(
-                product_image,
-                product_barcode
-            )
+        progress_bar.progress(70, text="Saving image to storage..")
+        # Save Image and get its ID
+        img_id = self.save_photo(
+            product_image,
+            product_barcode
+        )
 
-        with st.spinner("Saving product.."):
-            # Row parsing
-            body = {
-                "values": [
-                    [
-                        product_name,
-                        product_barcode,
-                        img_id,
-                        product_location,
-                        self.__get_currentDateTimeStamp()
-                    ]
+        progress_bar.progress(80, text="Saving product to stock..")
+
+        # Row parsing
+        body = {
+            "values": [
+                [
+                    product_name,
+                    product_barcode,
+                    img_id,
+                    product_location,
+                    self.__get_currentDateTimeStamp()
                 ]
-            }
+            ]
+        }
 
-            # Update google sheet with new obj data
-            self.__sheet.append(
-                spreadsheetId=self.__id,
-                range=self.__name,
-                valueInputOption='RAW',
-                body=body
-            ).execute()
+        # Update google sheet with new obj data
+        self.__sheet.append(
+            spreadsheetId=self.__id,
+            range=self.__name,
+            valueInputOption='RAW',
+            body=body
+        ).execute()
 
         st.toast("Product created", icon="✔️")
 
@@ -164,9 +166,17 @@ def auth_usr() -> stauth.Authenticate:
 
     return authenticator
 
-@st.cache_resource(show_spinner="Loading products..")
-def display_products(products: pd.DataFrame, N_cards_per_row=3) -> None:
+
+def display_products(in_products: pd.DataFrame,
+                     order_by: list=[],
+                     N_cards_per_row=3) -> None:
     """Display products."""
+    products = in_products.copy(deep=True)
+
+    # Sort products
+    products = products.sort_values(by=order_by)
+    
+    # Display products
     for n_row, row in products.reset_index().iterrows():
         i = n_row%N_cards_per_row
         if i==0:

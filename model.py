@@ -25,7 +25,7 @@ class BarCode:
         img = Image.open(barcode_image)
 
         return img
-
+@st.cache_resource(show_spinner="Loading product..")
 class Product:
     def __init__(self, row) -> None:
         self.photo = self._get_photo(row["product_photo_id"])
