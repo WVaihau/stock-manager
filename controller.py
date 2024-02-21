@@ -165,3 +165,14 @@ def auth_usr() -> stauth.Authenticate:
 
     return authenticator
 
+@st.cache_resource(show_spinner="Loading products..")
+def display_products(products: pd.DataFrame, N_cards_per_row=3) -> None:
+    """Display products."""
+    for n_row, row in products.reset_index().iterrows():
+        i = n_row%N_cards_per_row
+        if i==0:
+            cols = st.columns(N_cards_per_row, gap="large")
+
+        with cols[n_row%N_cards_per_row]:
+            md.Product(row).show()
+

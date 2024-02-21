@@ -44,19 +44,16 @@ def main():
 
 
             if len(search_bar_value) == 0:
+
+                if st.button("Refresh"):
+                    st.session_state["products"] = stock.get_stock()
+
                 st.write("**Tous les produits :**")
 
 
             st.session_state["products"] = st.session_state["products"].sort_values(by='product_location')
-            
-            N_cards_per_row = 3
-            for n_row, row in st.session_state["products"].reset_index().iterrows():
-                i = n_row%N_cards_per_row
-                if i==0:
-                    cols = st.columns(N_cards_per_row, gap="large")
 
-                with cols[n_row%N_cards_per_row]:
-                    ctrl.md.Product(row).show()
+            ctrl.display_products(st.session_state["products"])
         
         with tab_add:
             st.write("**\*Tous les champs doivent être remplis.**")

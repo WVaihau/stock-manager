@@ -26,7 +26,6 @@ class BarCode:
 
         return img
 
-@st.cache_resource
 class Product:
     def __init__(self, row) -> None:
         self.photo = self._get_photo(row["product_photo_id"])
