@@ -1,6 +1,5 @@
 import streamlit as st
 import controller as ctrl
-import requests
 
 st.set_page_config(
     page_title="Iaora Stock Manager",
@@ -108,9 +107,9 @@ def main():
                         warning_place_holder.warning(
                             "Tous les champs doivent être remplis pour sauvegarder le produit.")
 
-    elif authentication_status == False:
+    elif authentication_status is False:
         st.error('Username/mot de passe incorrect')
-    elif authentication_status == None:
+    elif authentication_status is None:
         st.warning('Identifiez vous pour continuer')
 
 

@@ -21,7 +21,6 @@ class Stock:
         self.__id = origin["sheet_id"]
         self.local_tz = timezone('Pacific/Tahiti')
 
-        creds = self.__credentials()
 
         self.__files = build(
             'drive',
@@ -91,14 +90,14 @@ class Stock:
             }
 
             # Update google sheet with new obj data
-            res = self.__sheet.append(
+            self.__sheet.append(
                 spreadsheetId=self.__id,
                 range=self.__name,
                 valueInputOption='RAW',
                 body=body
             ).execute()
 
-        st.toast(f"Product created", icon="✔️")
+        st.toast("Product created", icon="✔️")
 
 
     def save_photo(self, photo, photo_hash: str) -> str:
@@ -120,7 +119,7 @@ class Stock:
 
         # Upload the file to Google Drive
         file_metadata = self.__files.create(
-            body=self.__img_metadata(photo_hash),
+            body=img_metadata,
             media_body=media_body
         ).execute()
 
