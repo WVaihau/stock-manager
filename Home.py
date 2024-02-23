@@ -79,20 +79,20 @@ def main():
                             save_new_product = False
                             break
                     if save_new_product:
-                        submit_bar.progress(33, text="Checking duplicate..")
-                        existing_products = st.session_state["products"]
+                        # submit_bar.progress(33, text="Checking duplicate..")
+                        # existing_products = st.session_state["products"]
                         execute = True
 
                         # Check location:
-                        all_loc = existing_products["product_location"].tolist()
-                        if product_location in all_loc:
-                            ex_product = existing_products[
-                                existing_products["product_location"] == product_location
-                            ].iloc[0, 0]
-                            warning_place_holder = warning_place_holder.error(
-                                f"'{ex_product}' est déjà enregistré à la position '{product_location}'"
-                            )
-                            execute = False
+                        # all_loc = existing_products["product_location"].tolist()
+                        # if product_location in all_loc:
+                        #     ex_product = existing_products[
+                        #         existing_products["product_location"] == product_location
+                        #     ].iloc[0, 0]
+                        #     warning_place_holder = warning_place_holder.error(
+                        #         f"'{ex_product}' est déjà enregistré à la position '{product_location}'"
+                        #     )
+                        #     execute = False
 
                         if execute:
                             submit_bar.progress(66, text="Updating stock..")
