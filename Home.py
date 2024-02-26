@@ -53,7 +53,7 @@ def main():
             products_placeholder = st.empty()
 
             with products_placeholder.container():
-                ctrl.display_products(st.session_state["products"], order_by=['product_location'])
+                ctrl.display_products(st.session_state["products"], order_by=['product_name'])
         
         with tab_add:
             st.write("**\*Tous les champs doivent être remplis.**")
